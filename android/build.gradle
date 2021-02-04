@@ -26,15 +26,38 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         disable 'InvalidPackage'
     }
 
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    def localProperties = new Properties()
+    def localPropertiesFile = rootProject.file('local.properties')
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.withReader('UTF-8') { reader ->
+            localProperties.load(reader)
+        }
+    }
+    def flutterRoot = localProperties.getProperty('flutter.sdk')
+    if (flutterRoot == null) {
+        throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+    }
+
     dependencies {
+        compileOnly files("$flutterRoot/bin/cache/artifacts/engine/android-arm/flutter.jar")
         implementation 'androidx.annotation:annotation:1.0.0'
         implementation 'androidx.webkit:webkit:1.0.0'
     }
-    buildToolsVersion '30.0.2'
+
 }
