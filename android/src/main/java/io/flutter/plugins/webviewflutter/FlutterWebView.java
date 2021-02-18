@@ -92,43 +92,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     platformThreadHandler = new Handler(context.getMainLooper());
-    // Allow local storage.
-    WebSettings webSetting = webView.getSettings();
-    // 设置是否允许 WebView 使用 File 协议 设置为true，即允许在 File 域下执行任意 JavaScript 代码 有安全问题
-    // webSetting.setAllowFileAccess(true);
-    // 设置 WebView 底层的布局算法 1 NARROW_COLUMNS:可能的话使所有列的宽度不超过屏幕宽度. 2 NORMAL：正常显示不做任何渲染. 3 SINGLE_COLUMN：把所有内容放大 WebView 等宽的一列中
-    webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-    //设置自适应屏幕，两者合用
-    webSetting.setUseWideViewPort(true);// 将图片调整到适合 WebView 的大小
-    webSetting.setLoadWithOverviewMode(true);// 缩放至屏幕的大小
-    // 存储
-    webSetting.setAppCacheEnabled(true);// 设置 Application 缓存 API 是否开启 setAppCachePath
-    webSetting.setAppCacheMaxSize(Long.MAX_VALUE);
-    webSetting.setDatabaseEnabled(true);// 设置是否开启数据库存储 API 权限 setDatabasePath
-    webSetting.setDomStorageEnabled(true);// 设置是否开启 DOM 存储 API 权限
-    webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
-    // 插件
-    // webSetting.setPluginsEnabled(true);
-    webSetting.setPluginState(WebSettings.PluginState.ON_DEMAND);
-    // 设置渲染优先级
-    webSetting.setRenderPriority(WebSettings.RenderPriority.HIGH);
-    // 是否可访问 Content Provider 的资源，默认值 true
-    webSetting.setAllowContentAccess(true);
-    // 启用地理定位
-    webSetting.setGeolocationEnabled(true);
-    webSetting.setDefaultTextEncodingName("UTF-8");// 设置编码格式
-    webSetting.setTextSize(WebSettings.TextSize.NORMAL);
-    // 缩放操作
-    webSetting.setSupportZoom(true); // 支持缩放，默认为true。是下面那个的前提。
-    webSetting.setBuiltInZoomControls(true); // 设置内置的缩放控件。若为false，则该WebView不可缩放
-    webSetting.setDisplayZoomControls(false); // 隐藏 WebView 缩放按钮
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      // 允许从 http 加载资源
-      webSetting.setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-    }
-    webSetting.setJavaScriptCanOpenWindowsAutomatically(true);  // jsOpenWindows
-    // Multi windows is set with FlutterWebChromeClient by default to handle internal bug: b/159892679.
-    webSetting.setSupportMultipleWindows(true);
+    setDefaultWebSetting();
     webView.setWebChromeClient(new FlutterWebChromeClient());
 
     methodChannel = new MethodChannel(messenger, "plugins.flutter.io/webview_" + id);
@@ -154,6 +118,48 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       webView.loadUrl(url);
     }
   }
+
+  private void setDefaultWebSetting() {
+    // Allow local storage.
+    WebSettings webSetting = webView.getSettings();
+    // 设置是否允许 WebView 使用 File 协议 设置为true，即允许在 File 域下执行任意 JavaScript 代码 有安全问题
+    // webSetting.setAllowFileAccess(true);
+    // 设置 WebView 底层的布局算法 1 NARROW_COLUMNS:可能的话使所有列的宽度不超过屏幕宽度. 2 NORMAL：正常显示不做任何渲染. 3 SINGLE_COLUMN：把所有内容放大 WebView 等宽的一列中
+    webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+    //设置自适应屏幕，两者合用
+    webSetting.setUseWideViewPort(true);// 将图片调整到适合 WebView 的大小
+    webSetting.setLoadWithOverviewMode(true);// 缩放至屏幕的大小
+    // 存储
+    webSetting.setAppCacheEnabled(true);// 设置 Application 缓存 API 是否开启 setAppCachePath
+    webSetting.setAppCacheMaxSize(Long.MAX_VALUE);
+    webSetting.setDatabaseEnabled(true);// 设置是否开启数据库存储 API 权限 setDatabasePath
+    webSetting.setDomStorageEnabled(true);// 设置是否开启 DOM 存储 API 权限
+    webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
+    // 插件
+    // webSetting.setPluginsEnabled(true);
+    webSetting.setPluginState(WebSettings.PluginState.ON_DEMAND);
+    // 设置渲染优先级
+    webSetting.setRenderPriority(WebSettings.RenderPriority.HIGH);
+    // 是否可访问 Content Provider 的资源，默认值 true
+    webSetting.setAllowContentAccess(true);
+    // 启用地理定位
+    webSetting.setGeolocationEnabled(true);
+    webSetting.setDefaultTextEncodingName("UTF-8");// 设置编码格式
+    // 不随系统字体变化
+    webSetting.setTextZoom(100);
+    // 缩放操作
+    webSetting.setSupportZoom(true); // 支持缩放，默认为true。是下面那个的前提。
+    webSetting.setBuiltInZoomControls(true); // 设置内置的缩放控件。若为false，则该WebView不可缩放
+    webSetting.setDisplayZoomControls(false); // 隐藏 WebView 缩放按钮
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      // 允许从 http 加载资源
+      webSetting.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+    }
+    webSetting.setJavaScriptCanOpenWindowsAutomatically(true);  // jsOpenWindows
+    // Multi windows is set with FlutterWebChromeClient by default to handle internal bug: b/159892679.
+    webSetting.setSupportMultipleWindows(true);
+  }
+
 
   @Override
   public View getView() {
